@@ -78,8 +78,15 @@ ritual_app = workflow.compile()
 # --- SERVE FRONTEND ---
 @app.get("/")
 async def read_index():
+    # Gunakan path absolut yang fleksibel
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    path = os.path.join(current_dir, "../index.html")
+    # Jika index.html ada di root, dan main.py ada di folder /api/
+    path = os.path.join(current_dir, "..", "index.html")
+    
+    if not os.path.exists(path):
+        # Fallback jika struktur folder berbeda di prod
+        path = os.path.join(current_dir, "index.html")
+        
     return FileResponse(path)
 
 # --- API ENDPOINTS ---
