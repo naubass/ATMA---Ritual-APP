@@ -19,6 +19,31 @@
         .glitch-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(102, 0, 0, 0.2); display: none; z-index: 9999; pointer-events: none; }
         .terminal-text { font-family: 'JetBrains Mono', monospace; }
 
+        /* Gaya untuk Pesan Terakhir */
+        #final-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            width: 100%;
+            z-index: 10000;
+            display: none;
+        }
+
+        .fade-in-out {
+            animation: fadeInOut 4s forwards;
+            color: #86794d;
+            text-shadow: 0 0 20px rgba(134, 121, 77, 0.5);
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; filter: blur(10px); }
+            30% { opacity: 1; filter: blur(0px); }
+            70% { opacity: 1; filter: blur(0px); }
+            100% { opacity: 0; filter: blur(20px); }
+        }
+
         /* Video Container Styling */
         #video-container { width: 100%; max-width: 400px; margin: 0 auto; border: 1px solid #333; position: relative; display: none; overflow: hidden; filter: grayscale(100%) contrast(120%); }
         #video-preview { width: 100%; transform: scaleX(-1); }
@@ -75,6 +100,10 @@
             </div>
         </div>
     </section>
+
+    <div id="final-message">
+        <h2 class="cinzel text-3xl md:text-5xl tracking-[0.5em] uppercase">Permohonan Telah Dikabulkan</h2>
+    </div>
 
     <script>
         let currentStep = 'start';
@@ -173,10 +202,27 @@
         }
 
         function triggerDoom() {
+            // Tahap 1: Efek guncangan dan glitch parah
             document.body.classList.add('doom-active');
+            
             setTimeout(() => {
+                // Tahap 2: Bersihkan layar menjadi hitam pekat
                 document.body.innerHTML = "";
                 document.body.style.backgroundColor = "black";
+                document.body.classList.remove('doom-active');
+
+                // Tahap 3: Munculkan pesan ghaib
+                const container = document.createElement('div');
+                container.id = "final-message";
+                container.style.display = "block";
+                container.innerHTML = `<h2 class="cinzel text-3xl md:text-5xl tracking-[0.5em] uppercase fade-in-out">Permohonan Telah Dikabulkan</h2>`;
+                document.body.appendChild(container);
+
+                // Tahap 4: Hilangkan segalanya secara permanen setelah pesan selesai
+                setTimeout(() => {
+                    container.style.display = "none";
+                }, 4000);
+
             }, 1500);
         }
     </script>
