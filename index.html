@@ -202,28 +202,50 @@
         }
 
         function triggerDoom() {
-            // Tahap 1: Efek guncangan dan glitch parah
+            // Aktifkan efek hancur (glitch putih)
             document.body.classList.add('doom-active');
             
             setTimeout(() => {
-                // Tahap 2: Bersihkan layar menjadi hitam pekat
+                // Bersihkan body, tapi kita set style langsung agar font tetap terbaca
                 document.body.innerHTML = "";
                 document.body.style.backgroundColor = "black";
+                document.body.style.display = "flex";
+                document.body.style.alignItems = "center";
+                document.body.style.justifyContent = "center";
+                document.body.style.height = "100vh";
+                document.body.style.margin = "0";
                 document.body.classList.remove('doom-active');
 
-                // Tahap 3: Munculkan pesan ghaib
-                const container = document.createElement('div');
-                container.id = "final-message";
-                container.style.display = "block";
-                container.innerHTML = `<h2 class="cinzel text-3xl md:text-5xl tracking-[0.5em] uppercase fade-in-out">Permohonan Telah Dikabulkan</h2>`;
-                document.body.appendChild(container);
+                // Buat elemen pesan secara dinamis dengan style inline agar aman
+                const message = document.createElement('h2');
+                message.innerText = "Permohonan Telah Dikabulkan";
+                
+                // Tambahkan styling langsung via JS untuk menjamin tampilan
+                message.style.color = "#86794d";
+                message.style.fontFamily = "'Cinzel', serif";
+                message.style.fontSize = "2rem";
+                message.style.letterSpacing = "0.5em";
+                message.style.textTransform = "uppercase";
+                message.style.textAlign = "center";
+                message.style.opacity = "0";
+                message.style.transition = "opacity 2s ease-in-out, filter 2s ease-in-out";
+                message.style.filter = "blur(10px)";
+                
+                document.body.appendChild(message);
 
-                // Tahap 4: Hilangkan segalanya secara permanen setelah pesan selesai
+                // Trigger animasi muncul (Fade In)
                 setTimeout(() => {
-                    container.style.display = "none";
+                    message.style.opacity = "1";
+                    message.style.filter = "blur(0px)";
+                }, 100);
+
+                // Trigger animasi hilang (Fade Out) setelah 4 detik
+                setTimeout(() => {
+                    message.style.opacity = "0";
+                    message.style.filter = "blur(20px)";
                 }, 4000);
 
-            }, 1500);
+            }, 1500); // Durasi glitch sebelum layar hitam
         }
     </script>
 </body>
