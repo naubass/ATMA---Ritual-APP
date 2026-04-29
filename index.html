@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATMA | Ritual Digital</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,700;1,400&family=Cinzel:wght@400;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root { --blood-red: #660000; --dark-gold: #86794d; }
+        body, html { background-color: #020202; color: #d1d1d1; font-family: 'Cormorant Garamond', serif; scroll-behavior: smooth; overflow-x: hidden; }
+        
+        .hero-bg {
+            background: linear-gradient(to bottom, rgba(0,0,0,0.5), #020202), 
+                        url('https://images.unsplash.com/photo-1509248961158-e54f6934749c?q=80&w=2000&auto=format&fit=crop');
+            background-size: cover; background-position: center; background-attachment: fixed; height: 100vh;
+        }
+        .cinzel { font-family: 'Cinzel', serif; }
+        .glitch-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(102, 0, 0, 0.2); display: none; z-index: 9999; pointer-events: none; }
+        .terminal-text { font-family: 'JetBrains Mono', monospace; }
+
+        /* Video Container Styling */
+        #video-container { width: 100%; max-width: 400px; margin: 0 auto; border: 1px solid #333; position: relative; display: none; overflow: hidden; filter: grayscale(100%) contrast(120%); }
+        #video-preview { width: 100%; transform: scaleX(-1); }
+        .scanline { position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: rgba(255,0,0,0.3); animation: scan 3s linear infinite; }
+        @keyframes scan { from { top: 0; } to { top: 100%; } }
+
+        .echo-text { position: absolute; opacity: 0.1; pointer-events: none; white-space: nowrap; animation: rise 25s linear infinite; }
+        @keyframes rise { from { transform: translateY(100vh); } to { transform: translateY(-20vh); } }
+
+        @keyframes final-destruct {
+            0% { transform: translate(0); filter: hue-rotate(0deg); }
+            50% { transform: translate(-10px, 10px); filter: invert(1) sepia(1) saturate(5); }
+            100% { transform: translate(0); filter: brightness(0); }
+        }
+        .doom-active { animation: final-destruct 0.1s infinite; background: white !important; }
+    </style>
+</head>
+<body>
+
+    <div id="glitch-layer" class="glitch-overlay"></div>
+
+    <section class="hero-bg flex flex-col items-center justify-center text-center px-4 relative overflow-hidden">
+        <div id="echo-chamber" class="absolute inset-0"></div>
+        <div class="z-10">
+            <h1 class="cinzel text-6xl md:text-8xl tracking-[0.3em] text-white opacity-90 mb-4 uppercase">ATMA</h1>
+            <p class="text-xl italic text-[#86794d] opacity-60 tracking-widest">"Kamera adalah mata menuju jiwamu."</p>
+        </div>
+    </section>
+
+    <section class="min-h-screen flex items-center justify-center py-20 px-4 bg-[#020202]">
+        <div id="ritual-container" class="max-w-2xl w-full border border-[#222] bg-[#050505] p-8 md:p-16 relative shadow-2xl">
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#660000] to-transparent"></div>
+            
+            <div id="step-content">
+                <p id="void-speech" class="text-2xl md:text-3xl italic text-center mb-12 min-h-[80px]">Bisikkan keinginanmu...</p>
+                
+                <div id="input-wrapper">
+                    <textarea id="userInput" class="w-full bg-transparent border-b border-[#333] py-4 focus:outline-none focus:border-[#86794d] transition-all text-white text-xl font-light text-center h-24" placeholder="Ketik di sini..."></textarea>
+                </div>
+
+                <div id="video-container">
+                    <video id="video-preview" autoplay muted playsinline></video>
+                    <div class="scanline"></div>
+                </div>
+
+                <div class="flex justify-center mt-12">
+                    <button onclick="handleAction()" id="actionBtn" class="px-12 py-3 border border-[#444] text-[#86794d] hover:border-[#86794d] hover:text-white transition-all uppercase tracking-[0.3em] text-xs">Mulai Ritual</button>
+                </div>
+            </div>
+
+            <div id="timer-box" class="hidden mt-10 text-center border-t border-[#222] pt-8">
+                <p class="text-xs tracking-[0.4em] text-[#444] uppercase mb-2">Sisa Waktu Perjanjian</p>
+                <div id="timer" class="terminal-text text-5xl text-[#660000]">00:10</div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        let currentStep = 'start';
+        let mediaStream = null;
+        let mediaRecorder = null;
+        let recordedChunks = [];
+        const userId = 'user_' + Math.random().toString(36).substr(2, 9);
+
+        async function handleAction() {
+            if (currentStep === 'start') {
+                await submitWish();
+            } else if (currentStep === 'demanding') {
+                startRecording();
+            }
+        }
+
+        async function submitWish() {
+            const input = document.getElementById('userInput');
+            const userText = input.value;
+            if(!userText) return;
+
+            try {
+                const response = await fetch('/api/ritual', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: userId, text: userText, step: 'start' })
+                });
+                const data = await response.json();
+                
+                document.getElementById('void-speech').innerText = data.response;
+                currentStep = 'demanding';
+                setupCamera(); // Aktifkan kamera untuk tahap tumbal
+            } catch (err) { console.error(err); }
+        }
+
+        async function setupCamera() {
+            document.getElementById('input-wrapper').style.display = 'none';
+            document.getElementById('video-container').style.display = 'block';
+            document.getElementById('actionBtn').innerText = "Berikan Jiwa (Rekam)";
+            
+            mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+            document.getElementById('video-preview').srcObject = mediaStream;
+        }
+
+        function startRecording() {
+            document.getElementById('actionBtn').disabled = true;
+            document.getElementById('actionBtn').innerText = "Merekam Tumbal...";
+            
+            mediaRecorder = new MediaRecorder(mediaStream);
+            mediaRecorder.ondataavailable = (e) => recordedChunks.push(e.data);
+            mediaRecorder.onstop = finalizeRitual;
+            
+            mediaRecorder.start();
+            setTimeout(() => mediaRecorder.stop(), 3000); // Rekam 3 detik sebagai tumbal
+        }
+
+        async function finalizeRitual() {
+            document.getElementById('video-container').style.filter = "invert(1) grayscale(100%)";
+            
+            // Simulasi pengiriman video ke backend
+            const response = await fetch('/api/ritual', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id: userId, text: "Video Sacrifice Provided", step: 'demanding' })
+            });
+            const data = await response.json();
+
+            document.getElementById('step-content').innerHTML = `
+                <div class="text-center">
+                    <h2 class="cinzel text-4xl text-white mb-4 tracking-widest animate-pulse">KONTRAK MATI</h2>
+                    <p class="italic text-[#86794d]">${data.response}</p>
+                </div>
+            `;
+            
+            document.getElementById('timer-box').classList.remove('hidden');
+            startCountdown(10);
+            if(mediaStream) mediaStream.getTracks().forEach(track => track.stop());
+        }
+
+        function startCountdown(seconds) {
+            let counter = seconds;
+            const interval = setInterval(() => {
+                counter--;
+                document.getElementById('timer').innerText = `00:${counter.toString().padStart(2, '0')}`;
+                
+                if(counter <= 5) {
+                    document.getElementById('glitch-layer').style.display = 'block';
+                    document.body.style.transform = `translate(${Math.random()*5}px, ${Math.random()*5}px)`;
+                }
+
+                if (counter <= 0) {
+                    clearInterval(interval);
+                    triggerDoom();
+                }
+            }, 1000);
+        }
+
+        function triggerDoom() {
+            document.body.classList.add('doom-active');
+            setTimeout(() => {
+                document.body.innerHTML = "";
+                document.body.style.backgroundColor = "black";
+            }, 1500);
+        }
+    </script>
+</body>
+</html>
