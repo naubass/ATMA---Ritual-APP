@@ -3,250 +3,710 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ATMA | Ritual Digital</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,700;1,400&family=Cinzel:wght@400;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <title>ATMA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
     <style>
-        :root { --blood-red: #660000; --dark-gold: #86794d; }
-        body, html { background-color: #020202; color: #d1d1d1; font-family: 'Cormorant Garamond', serif; scroll-behavior: smooth; overflow-x: hidden; }
-        
-        .hero-bg {
-            background: linear-gradient(to bottom, rgba(0,0,0,0.5), #020202), 
-                        url('https://images.unsplash.com/photo-1509248961158-e54f6934749c?q=80&w=2000&auto=format&fit=crop');
-            background-size: cover; background-position: center; background-attachment: fixed; height: 100vh;
-        }
-        .cinzel { font-family: 'Cinzel', serif; }
-        .glitch-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(102, 0, 0, 0.2); display: none; z-index: 9999; pointer-events: none; }
-        .terminal-text { font-family: 'JetBrains Mono', monospace; }
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-        /* Gaya untuk Pesan Terakhir */
-        #final-message {
+        :root {
+            --white: #f5f0eb;
+            --off-white: #ede8e1;
+            --paper: #e8e1d6;
+            --mid: #b8a99a;
+            --warm-gray: #8a7b70;
+            --dark: #1a1512;
+            --darker: #0e0c0a;
+            --red: #c0392b;
+            --red-dim: #7a1f17;
+            --serif: 'Playfair Display', Georgia, serif;
+            --sans: 'DM Sans', sans-serif;
+            --mono: 'DM Mono', monospace;
+        }
+
+        html { scroll-behavior: smooth; overflow-x: hidden; }
+        body {
+            background: var(--darker);
+            color: var(--white);
+            font-family: var(--sans);
+            font-weight: 300;
+            min-height: 100vh;
+            cursor: default;
+        }
+
+        /* ─── NOISE TEXTURE OVERLAY ─── */
+        body::before {
+            content: '';
             position: fixed;
-            top: 50%;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 9998;
+            opacity: 0.6;
+        }
+
+        /* ─── HERO ─── */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 60% 50% at 50% 100%, rgba(192,57,43,0.08) 0%, transparent 70%),
+                radial-gradient(ellipse 100% 80% at 50% 50%, rgba(14,12,10,0.4) 0%, transparent 100%),
+                url('https://images.unsplash.com/photo-1509248961158-e54f6934749c?q=80&w=2000&auto=format&fit=crop&grayscale') center/cover no-repeat;
+            filter: grayscale(80%) brightness(0.25) contrast(1.2);
+        }
+
+        .hero-vignette {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse 80% 80% at 50% 50%, transparent 30%, var(--darker) 100%);
+        }
+
+        .hero-line-top {
+            position: absolute;
+            top: 0;
             left: 50%;
-            transform: translate(-50%, -50%);
+            transform: translateX(-50%);
+            width: 1px;
+            height: 80px;
+            background: linear-gradient(to bottom, transparent, var(--mid));
+            opacity: 0.3;
+        }
+
+        .hero-line-bottom {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 1px;
+            height: 80px;
+            background: linear-gradient(to top, transparent, var(--mid));
+            opacity: 0.3;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
             text-align: center;
+            padding: 0 24px;
+        }
+
+        .hero-eyebrow {
+            font-family: var(--mono);
+            font-size: 10px;
+            letter-spacing: 0.4em;
+            color: var(--mid);
+            text-transform: uppercase;
+            margin-bottom: 24px;
+            opacity: 0;
+            animation: fadeUp 1.2s ease 0.3s forwards;
+        }
+
+        .hero-title {
+            font-family: var(--serif);
+            font-size: clamp(80px, 16vw, 160px);
+            font-weight: 400;
+            letter-spacing: -0.02em;
+            line-height: 0.9;
+            color: var(--white);
+            opacity: 0;
+            animation: fadeUp 1.2s ease 0.6s forwards;
+            position: relative;
+        }
+
+        .hero-title .title-italic {
+            font-style: italic;
+            color: var(--mid);
+            font-size: 0.6em;
+            display: block;
+            letter-spacing: 0.05em;
+        }
+
+        .hero-sub {
+            font-family: var(--serif);
+            font-style: italic;
+            font-size: 15px;
+            color: var(--warm-gray);
+            margin-top: 28px;
+            letter-spacing: 0.05em;
+            opacity: 0;
+            animation: fadeUp 1.2s ease 0.9s forwards;
+        }
+
+        .hero-scroll {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            opacity: 0;
+            animation: fadeUp 1s ease 1.5s forwards;
+        }
+
+        .hero-scroll span {
+            font-family: var(--mono);
+            font-size: 9px;
+            letter-spacing: 0.3em;
+            color: var(--warm-gray);
+            text-transform: uppercase;
+        }
+
+        .scroll-line {
+            width: 1px;
+            height: 40px;
+            background: linear-gradient(to bottom, var(--warm-gray), transparent);
+            animation: scrollPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes scrollPulse {
+            0%, 100% { opacity: 0.4; transform: scaleY(1); }
+            50% { opacity: 1; transform: scaleY(1.1); }
+        }
+
+        /* ─── MAIN SECTION ─── */
+        .ritual-section {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 80px 24px;
+        }
+
+        .ritual-card {
             width: 100%;
-            z-index: 10000;
+            max-width: 520px;
+            background: rgba(26,21,18,0.95);
+            border: 1px solid rgba(184,169,154,0.12);
+            padding: 60px 48px;
+            position: relative;
+            backdrop-filter: blur(20px);
+        }
+
+        .ritual-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(to right, transparent, rgba(192,57,43,0.6), transparent);
+        }
+
+        .ritual-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(to right, transparent, rgba(184,169,154,0.2), transparent);
+        }
+
+        .card-corner {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            border-color: rgba(184,169,154,0.25);
+            border-style: solid;
+        }
+        .card-corner.tl { top: -1px; left: -1px; border-width: 1px 0 0 1px; }
+        .card-corner.tr { top: -1px; right: -1px; border-width: 1px 1px 0 0; }
+        .card-corner.bl { bottom: -1px; left: -1px; border-width: 0 0 1px 1px; }
+        .card-corner.br { bottom: -1px; right: -1px; border-width: 0 1px 1px 0; }
+
+        .ritual-label {
+            font-family: var(--mono);
+            font-size: 9px;
+            letter-spacing: 0.35em;
+            color: var(--red);
+            text-transform: uppercase;
+            margin-bottom: 32px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .ritual-label::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(192,57,43,0.25);
+        }
+
+        #void-speech {
+            font-family: var(--serif);
+            font-size: 22px;
+            line-height: 1.5;
+            color: var(--off-white);
+            margin-bottom: 40px;
+            min-height: 72px;
+            font-style: italic;
+            transition: opacity 0.5s ease;
+        }
+
+        /* ─── TEXTAREA ─── */
+        #input-wrapper { margin-bottom: 36px; }
+
+        #userInput {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid rgba(184,169,154,0.2);
+            padding: 16px 0;
+            color: var(--white);
+            font-family: var(--serif);
+            font-size: 18px;
+            font-style: italic;
+            resize: none;
+            height: 100px;
+            transition: border-color 0.3s ease;
+            outline: none;
+        }
+
+        #userInput::placeholder { color: rgba(184,169,154,0.3); }
+        #userInput:focus { border-bottom-color: rgba(192,57,43,0.5); }
+
+        /* ─── VIDEO ─── */
+        #video-container {
             display: none;
+            position: relative;
+            margin-bottom: 36px;
+            overflow: hidden;
+            border: 1px solid rgba(184,169,154,0.1);
         }
 
-        .fade-in-out {
-            animation: fadeInOut 4s forwards;
-            color: #86794d;
-            text-shadow: 0 0 20px rgba(134, 121, 77, 0.5);
+        #video-preview {
+            width: 100%;
+            transform: scaleX(-1);
+            display: block;
+            filter: grayscale(100%) contrast(1.1) brightness(0.9);
         }
 
-        @keyframes fadeInOut {
-            0% { opacity: 0; filter: blur(10px); }
-            30% { opacity: 1; filter: blur(0px); }
-            70% { opacity: 1; filter: blur(0px); }
-            100% { opacity: 0; filter: blur(20px); }
+        .scanline {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
+            height: 2px;
+            background: rgba(192,57,43,0.4);
+            animation: scan 4s linear infinite;
         }
 
-        /* Video Container Styling */
-        #video-container { width: 100%; max-width: 400px; margin: 0 auto; border: 1px solid #333; position: relative; display: none; overflow: hidden; filter: grayscale(100%) contrast(120%); }
-        #video-preview { width: 100%; transform: scaleX(-1); }
-        .scanline { position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: rgba(255,0,0,0.3); animation: scan 3s linear infinite; }
+        .video-overlay {
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0,0,0,0.03) 2px,
+                rgba(0,0,0,0.03) 4px
+            );
+            pointer-events: none;
+        }
+
+        .video-label {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            font-family: var(--mono);
+            font-size: 9px;
+            letter-spacing: 0.25em;
+            color: var(--red);
+            opacity: 0.7;
+        }
+
         @keyframes scan { from { top: 0; } to { top: 100%; } }
 
-        .echo-text { position: absolute; opacity: 0.1; pointer-events: none; white-space: nowrap; animation: rise 25s linear infinite; }
-        @keyframes rise { from { transform: translateY(100vh); } to { transform: translateY(-20vh); } }
-
-        @keyframes final-destruct {
-            0% { transform: translate(0); filter: hue-rotate(0deg); }
-            50% { transform: translate(-10px, 10px); filter: invert(1) sepia(1) saturate(5); }
-            100% { transform: translate(0); filter: brightness(0); }
+        /* ─── BUTTON ─── */
+        #actionBtn {
+            width: 100%;
+            padding: 16px 32px;
+            background: transparent;
+            border: 1px solid rgba(184,169,154,0.2);
+            color: var(--mid);
+            font-family: var(--mono);
+            font-size: 10px;
+            letter-spacing: 0.35em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
-        .doom-active { animation: final-destruct 0.1s infinite; background: white !important; }
+
+        #actionBtn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(192,57,43,0.0);
+            transition: background 0.3s ease;
+        }
+
+        #actionBtn:hover {
+            border-color: rgba(192,57,43,0.5);
+            color: var(--white);
+        }
+
+        #actionBtn:hover::before { background: rgba(192,57,43,0.06); }
+        #actionBtn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        /* ─── TIMER ─── */
+        #timer-box {
+            display: none;
+            margin-top: 40px;
+            padding-top: 32px;
+            border-top: 1px solid rgba(184,169,154,0.08);
+            text-align: center;
+        }
+
+        .timer-label {
+            font-family: var(--mono);
+            font-size: 9px;
+            letter-spacing: 0.35em;
+            color: var(--warm-gray);
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        #timer {
+            font-family: var(--serif);
+            font-size: 56px;
+            font-weight: 400;
+            color: var(--red);
+            letter-spacing: -0.02em;
+            line-height: 1;
+            transition: color 0.3s ease;
+        }
+
+        /* ─── GLITCH ─── */
+        #glitch-layer {
+            position: fixed;
+            inset: 0;
+            display: none;
+            pointer-events: none;
+            z-index: 9999;
+            mix-blend-mode: overlay;
+        }
+
+        .glitch-stripe {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: rgba(192,57,43,0.4);
+        }
+
+        /* ─── FINAL MESSAGE ─── */
+        #final-screen {
+            position: fixed;
+            inset: 0;
+            background: var(--darker);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .final-title {
+            font-family: var(--serif);
+            font-style: italic;
+            font-size: clamp(24px, 4vw, 40px);
+            color: var(--mid);
+            letter-spacing: 0.05em;
+            opacity: 0;
+            transition: opacity 2s ease, filter 2s ease;
+            filter: blur(12px);
+            text-align: center;
+            padding: 0 32px;
+        }
+
+        .final-line {
+            width: 1px;
+            height: 60px;
+            background: linear-gradient(to bottom, rgba(192,57,43,0.6), transparent);
+            opacity: 0;
+            transition: opacity 2s ease 0.5s;
+        }
+
+        /* ─── ANIMATIONS ─── */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes destruct {
+            0% { transform: translate(0,0); filter: none; }
+            20% { transform: translate(-4px, 2px); filter: hue-rotate(180deg) saturate(5); }
+            40% { transform: translate(4px, -3px); filter: invert(1); }
+            60% { transform: translate(-2px, 4px); filter: brightness(3) hue-rotate(90deg); }
+            80% { transform: translate(3px, -1px); filter: saturate(10) contrast(5); }
+            100% { transform: translate(0,0); filter: brightness(0); }
+        }
+
+        .doom-active { animation: destruct 0.15s steps(1) infinite; }
+
+        @media (max-width: 600px) {
+            .ritual-card { padding: 40px 28px; }
+            #void-speech { font-size: 18px; }
+        }
     </style>
 </head>
 <body>
 
-    <div id="glitch-layer" class="glitch-overlay"></div>
+<div id="glitch-layer"></div>
 
-    <section class="hero-bg flex flex-col items-center justify-center text-center px-4 relative overflow-hidden">
-        <div id="echo-chamber" class="absolute inset-0"></div>
-        <div class="z-10">
-            <h1 class="cinzel text-6xl md:text-8xl tracking-[0.3em] text-white opacity-90 mb-4 uppercase">ATMA</h1>
-            <p class="text-xl italic text-[#86794d] opacity-60 tracking-widest">"Kamera adalah mata menuju jiwamu."</p>
-        </div>
-    </section>
+<div id="final-screen">
+    <div class="final-line" id="final-line"></div>
+    <h2 class="final-title" id="final-title">Permohonan Telah Dikabulkan</h2>
+</div>
 
-    <section class="min-h-screen flex items-center justify-center py-20 px-4 bg-[#020202]">
-        <div id="ritual-container" class="max-w-2xl w-full border border-[#222] bg-[#050505] p-8 md:p-16 relative shadow-2xl">
-            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#660000] to-transparent"></div>
-            
-            <div id="step-content">
-                <p id="void-speech" class="text-2xl md:text-3xl italic text-center mb-12 min-h-[80px]">Bisikkan keinginanmu...</p>
-                
-                <div id="input-wrapper">
-                    <textarea id="userInput" class="w-full bg-transparent border-b border-[#333] py-4 focus:outline-none focus:border-[#86794d] transition-all text-white text-xl font-light text-center h-24" placeholder="Ketik di sini..."></textarea>
-                </div>
+<!-- HERO -->
+<section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-vignette"></div>
+    <div class="hero-line-top"></div>
+    <div class="hero-line-bottom"></div>
 
-                <div id="video-container">
-                    <video id="video-preview" autoplay muted playsinline></video>
-                    <div class="scanline"></div>
-                </div>
-
-                <div class="flex justify-center mt-12">
-                    <button onclick="handleAction()" id="actionBtn" class="px-12 py-3 border border-[#444] text-[#86794d] hover:border-[#86794d] hover:text-white transition-all uppercase tracking-[0.3em] text-xs">Mulai Ritual</button>
-                </div>
-            </div>
-
-            <div id="timer-box" class="hidden mt-10 text-center border-t border-[#222] pt-8">
-                <p class="text-xs tracking-[0.4em] text-[#444] uppercase mb-2">Sisa Waktu Perjanjian</p>
-                <div id="timer" class="terminal-text text-5xl text-[#660000]">00:10</div>
-            </div>
-        </div>
-    </section>
-
-    <div id="final-message">
-        <h2 class="cinzel text-3xl md:text-5xl tracking-[0.5em] uppercase">Permohonan Telah Dikabulkan</h2>
+    <div class="hero-content">
+        <p class="hero-eyebrow">Ritual Digital — 2024</p>
+        <h1 class="hero-title">
+            ATMA
+            <span class="title-italic">jiwa</span>
+        </h1>
+        <p class="hero-sub">"Kamera adalah mata menuju jiwamu."</p>
     </div>
 
-    <script>
-        let currentStep = 'start';
-        let mediaStream = null;
-        let mediaRecorder = null;
-        let recordedChunks = [];
-        const userId = 'user_' + Math.random().toString(36).substr(2, 9);
+    <div class="hero-scroll">
+        <span>Mulai</span>
+        <div class="scroll-line"></div>
+    </div>
+</section>
 
-        async function handleAction() {
-            if (currentStep === 'start') {
-                await submitWish();
-            } else if (currentStep === 'demanding') {
-                startRecording();
-            }
+<!-- RITUAL SECTION -->
+<section class="ritual-section">
+    <div class="ritual-card">
+        <div class="card-corner tl"></div>
+        <div class="card-corner tr"></div>
+        <div class="card-corner bl"></div>
+        <div class="card-corner br"></div>
+
+        <div class="ritual-label">Ritual</div>
+
+        <div id="step-content">
+            <p id="void-speech">Bisikkan keinginanmu...</p>
+
+            <div id="input-wrapper">
+                <textarea
+                    id="userInput"
+                    placeholder="Apa yang kamu inginkan..."
+                    spellcheck="false"
+                ></textarea>
+            </div>
+
+            <div id="video-container">
+                <video id="video-preview" autoplay muted playsinline></video>
+                <div class="scanline"></div>
+                <div class="video-overlay"></div>
+                <span class="video-label">● REC</span>
+            </div>
+
+            <button onclick="handleAction()" id="actionBtn">Mulai Ritual</button>
+        </div>
+
+        <div id="timer-box">
+            <p class="timer-label">Sisa Waktu Perjanjian</p>
+            <div id="timer">00:10</div>
+        </div>
+    </div>
+</section>
+
+<script>
+    let currentStep = 'start';
+    let mediaStream = null;
+    let mediaRecorder = null;
+    let recordedChunks = [];
+    const userId = 'user_' + Math.random().toString(36).substr(2, 9);
+
+    async function handleAction() {
+        if (currentStep === 'start') {
+            await submitWish();
+        } else if (currentStep === 'demanding') {
+            startRecording();
         }
+    }
 
-        async function submitWish() {
-            const input = document.getElementById('userInput');
-            const userText = input.value;
-            if(!userText) return;
+    async function submitWish() {
+        const input = document.getElementById('userInput');
+        const userText = input.value;
+        if (!userText.trim()) return;
 
-            try {
-                const response = await fetch('/api/ritual', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ user_id: userId, text: userText, step: 'start' })
-                });
-                const data = await response.json();
-                
-                document.getElementById('void-speech').innerText = data.response;
-                currentStep = 'demanding';
-                setupCamera(); // Aktifkan kamera untuk tahap tumbal
-            } catch (err) { console.error(err); }
-        }
+        const btn = document.getElementById('actionBtn');
+        btn.disabled = true;
+        btn.textContent = 'Mengirim...';
 
-        async function setupCamera() {
-            document.getElementById('input-wrapper').style.display = 'none';
-            document.getElementById('video-container').style.display = 'block';
-            document.getElementById('actionBtn').innerText = "Berikan Jiwa (Rekam)";
-            
-            mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-            document.getElementById('video-preview').srcObject = mediaStream;
-        }
+        const speech = document.getElementById('void-speech');
+        speech.style.opacity = '0';
 
-        function startRecording() {
-            document.getElementById('actionBtn').disabled = true;
-            document.getElementById('actionBtn').innerText = "Merekam Tumbal...";
-            
-            mediaRecorder = new MediaRecorder(mediaStream);
-            mediaRecorder.ondataavailable = (e) => recordedChunks.push(e.data);
-            mediaRecorder.onstop = finalizeRitual;
-            
-            mediaRecorder.start();
-            setTimeout(() => mediaRecorder.stop(), 3000); // Rekam 3 detik sebagai tumbal
-        }
-
-        async function finalizeRitual() {
-            document.getElementById('video-container').style.filter = "invert(1) grayscale(100%)";
-            
-            // Simulasi pengiriman video ke backend
+        try {
             const response = await fetch('/api/ritual', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ user_id: userId, text: "Video Sacrifice Provided", step: 'demanding' })
+                body: JSON.stringify({ user_id: userId, text: userText, step: 'start' })
+            });
+            const data = await response.json();
+
+            setTimeout(() => {
+                speech.textContent = data.response;
+                speech.style.opacity = '1';
+            }, 400);
+
+            currentStep = 'demanding';
+            setTimeout(setupCamera, 600);
+        } catch (err) {
+            console.error(err);
+            btn.disabled = false;
+            btn.textContent = 'Coba Lagi';
+        }
+    }
+
+    async function setupCamera() {
+        document.getElementById('input-wrapper').style.display = 'none';
+        document.getElementById('video-container').style.display = 'block';
+
+        const btn = document.getElementById('actionBtn');
+        btn.disabled = false;
+        btn.textContent = 'Berikan Jiwa (Rekam)';
+
+        try {
+            mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+            document.getElementById('video-preview').srcObject = mediaStream;
+        } catch (err) {
+            console.error('Camera error:', err);
+        }
+    }
+
+    function startRecording() {
+        const btn = document.getElementById('actionBtn');
+        btn.disabled = true;
+        btn.textContent = 'Merekam Tumbal...';
+
+        mediaRecorder = new MediaRecorder(mediaStream);
+        mediaRecorder.ondataavailable = (e) => recordedChunks.push(e.data);
+        mediaRecorder.onstop = finalizeRitual;
+        mediaRecorder.start();
+        setTimeout(() => mediaRecorder.stop(), 3000);
+    }
+
+    async function finalizeRitual() {
+        const vc = document.getElementById('video-container');
+        vc.style.filter = 'invert(1) grayscale(100%) contrast(1.5)';
+
+        try {
+            const response = await fetch('/api/ritual', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id: userId, text: 'Video Sacrifice Provided', step: 'demanding' })
             });
             const data = await response.json();
 
             document.getElementById('step-content').innerHTML = `
-                <div class="text-center">
-                    <h2 class="cinzel text-4xl text-white mb-4 tracking-widest animate-pulse">KONTRAK MATI</h2>
-                    <p class="italic text-[#86794d]">${data.response}</p>
+                <div style="text-align:center; padding: 8px 0;">
+                    <p style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.35em;color:#c0392b;text-transform:uppercase;margin-bottom:24px;">Kontrak Mati</p>
+                    <p style="font-family:'Playfair Display',serif;font-style:italic;font-size:20px;line-height:1.6;color:#ede8e1;">${data.response}</p>
                 </div>
             `;
-            
-            document.getElementById('timer-box').classList.remove('hidden');
-            startCountdown(10);
-            if(mediaStream) mediaStream.getTracks().forEach(track => track.stop());
+        } catch (err) {
+            document.getElementById('step-content').innerHTML = `
+                <div style="text-align:center; padding: 8px 0;">
+                    <p style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.35em;color:#c0392b;text-transform:uppercase;margin-bottom:24px;">Kontrak Mati</p>
+                    <p style="font-family:'Playfair Display',serif;font-style:italic;font-size:20px;line-height:1.6;color:#ede8e1;">Jiwamu telah tercatat di alam kegelapan...</p>
+                </div>
+            `;
         }
 
-        function startCountdown(seconds) {
-            let counter = seconds;
-            const interval = setInterval(() => {
-                counter--;
-                document.getElementById('timer').innerText = `00:${counter.toString().padStart(2, '0')}`;
-                
-                if(counter <= 5) {
-                    document.getElementById('glitch-layer').style.display = 'block';
-                    document.body.style.transform = `translate(${Math.random()*5}px, ${Math.random()*5}px)`;
-                }
+        document.getElementById('timer-box').style.display = 'block';
+        startCountdown(10);
+        if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
+    }
 
-                if (counter <= 0) {
-                    clearInterval(interval);
-                    triggerDoom();
-                }
-            }, 1000);
+    function startCountdown(seconds) {
+        let counter = seconds;
+        const timerEl = document.getElementById('timer');
+        const glitch = document.getElementById('glitch-layer');
+
+        const interval = setInterval(() => {
+            counter--;
+            timerEl.textContent = `00:${counter.toString().padStart(2, '0')}`;
+
+            if (counter <= 5) {
+                glitch.style.display = 'block';
+                randomGlitch();
+                document.body.style.transform = `translate(${(Math.random()-0.5)*4}px,${(Math.random()-0.5)*4}px)`;
+            }
+
+            if (counter <= 3) {
+                timerEl.style.color = '#ff2222';
+                timerEl.style.textShadow = '0 0 20px rgba(255,0,0,0.5)';
+            }
+
+            if (counter <= 0) {
+                clearInterval(interval);
+                document.body.style.transform = '';
+                triggerDoom();
+            }
+        }, 1000);
+    }
+
+    function randomGlitch() {
+        const glitch = document.getElementById('glitch-layer');
+        glitch.innerHTML = '';
+        const count = Math.floor(Math.random() * 5) + 2;
+        for (let i = 0; i < count; i++) {
+            const stripe = document.createElement('div');
+            stripe.className = 'glitch-stripe';
+            stripe.style.top = `${Math.random() * 100}%`;
+            stripe.style.opacity = Math.random() * 0.6 + 0.2;
+            stripe.style.height = `${Math.random() * 4 + 1}px`;
+            glitch.appendChild(stripe);
         }
+        setTimeout(() => glitch.innerHTML = '', 120);
+    }
 
-        function triggerDoom() {
-            // Aktifkan efek hancur (glitch putih)
-            document.body.classList.add('doom-active');
-            
+    function triggerDoom() {
+        document.body.classList.add('doom-active');
+
+        setTimeout(() => {
+            document.body.classList.remove('doom-active');
+            const screen = document.getElementById('final-screen');
+            screen.style.display = 'flex';
+
             setTimeout(() => {
-                // Bersihkan body, tapi kita set style langsung agar font tetap terbaca
-                document.body.innerHTML = "";
-                document.body.style.backgroundColor = "black";
-                document.body.style.display = "flex";
-                document.body.style.alignItems = "center";
-                document.body.style.justifyContent = "center";
-                document.body.style.height = "100vh";
-                document.body.style.margin = "0";
-                document.body.classList.remove('doom-active');
+                const line = document.getElementById('final-line');
+                const title = document.getElementById('final-title');
+                line.style.opacity = '1';
 
-                // Buat elemen pesan secara dinamis dengan style inline agar aman
-                const message = document.createElement('h2');
-                message.innerText = "Permohonan Telah Dikabulkan";
-                
-                // Tambahkan styling langsung via JS untuk menjamin tampilan
-                message.style.color = "#86794d";
-                message.style.fontFamily = "'Cinzel', serif";
-                message.style.fontSize = "2rem";
-                message.style.letterSpacing = "0.5em";
-                message.style.textTransform = "uppercase";
-                message.style.textAlign = "center";
-                message.style.opacity = "0";
-                message.style.transition = "opacity 2s ease-in-out, filter 2s ease-in-out";
-                message.style.filter = "blur(10px)";
-                
-                document.body.appendChild(message);
-
-                // Trigger animasi muncul (Fade In)
                 setTimeout(() => {
-                    message.style.opacity = "1";
-                    message.style.filter = "blur(0px)";
-                }, 100);
+                    title.style.opacity = '1';
+                    title.style.filter = 'blur(0px)';
+                }, 300);
 
-                // Trigger animasi hilang (Fade Out) setelah 4 detik
                 setTimeout(() => {
-                    message.style.opacity = "0";
-                    message.style.filter = "blur(20px)";
-                }, 4000);
-
-            }, 1500); // Durasi glitch sebelum layar hitam
-        }
-    </script>
+                    title.style.opacity = '0';
+                    title.style.filter = 'blur(12px)';
+                    line.style.opacity = '0';
+                }, 4500);
+            }, 100);
+        }, 1500);
+    }
+</script>
 </body>
 </html>
